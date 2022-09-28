@@ -30,6 +30,7 @@ const downloadVideo = async (url) => {
       const getTitle = info.videoDetails.title;
       const downloadTitle = `${getTitle.replace(/\W/g, " ")}.mp4`;
       let file;
+      let resultFolder;
       //check for custom download folder directory
       db.get(`SELECT path FROM folder WHERE id = 1`, (err, row) => {
         if (!row) {
@@ -45,9 +46,9 @@ const downloadVideo = async (url) => {
           file = fs.createWriteStream(
             `${os.homedir()}/Downloads/${downloadTitle}`
           );
-
+          resultFolder = `${os.homedir()}/Downloads`;
           // //download process
-          download(spinner, url, file, receivedBytes);
+          download(spinner, url, file, receivedBytes, resultFolder);
         } else if (row) {
           //if a download folder path is found
           //verify it exists
@@ -61,8 +62,16 @@ const downloadVideo = async (url) => {
               //when the path exists
               //download process starts
               file = fs.createWriteStream(`${row.path}/${downloadTitle}`);
+              resultFolder = `${row.path}`;
               // download process
-              download(spinner, url, file, receivedBytes, row.path);
+              download(
+                spinner,
+                url,
+                file,
+                receivedBytes,
+                row.path,
+                resultFolder
+              );
             }
           });
         }
@@ -150,9 +159,7 @@ const downloadAudio = async (url) => {
   }
 };
 
-const download = (spinner, url, file, receivedBytes, row) => {
-  const rowPath = `${row}`;
-  const defaultPath = `${os.homedir()}/Downloads`;
+const download = (spinner, url, file, receivedBytes, resultFolder) => {
   spinner.start();
   ytdl(url)
     .addListener("progress", (chunkLength, received, total) => {
@@ -168,11 +175,7 @@ const download = (spinner, url, file, receivedBytes, row) => {
       spinner.fail("An error occurred");
     });
   file.on("finish", () => {
-    rowPath === `${undefined}/${undefined}`
-      ? spinner.succeed(
-          `Download complete. Download directory - ${defaultPath} `
-        )
-      : spinner.succeed(`Download complete. Download directory - ${rowPath}`);
+    spinner.succeed(`Download complete. Download folder - ${resultFolder}`);
   });
   file.on("error", () => {
     unlink(file);
