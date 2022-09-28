@@ -1,4 +1,4 @@
-# CLI-Mailer - a command line interface app
+# YDLR-CLI - a youtube command line interface app
 
 ## Table of Contents
 
