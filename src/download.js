@@ -101,11 +101,9 @@ const downloadAudio = async (url) => {
       const __dirname = join(dirname(__filename) + "/temp");
 
       //Creating dirname if it doesn't exist
-      fs.access(__dirname, (err) => {
-        if (err) {
-          mkdir(__dirname);
-        }
-      });
+      if (!fs.existsSync(__dirname)) {
+        fs.mkdirSync(__dirname);
+      }
       const tempFile = fs.createWriteStream(`${__dirname}/${downloadTitle}`);
       let outputPath;
 
