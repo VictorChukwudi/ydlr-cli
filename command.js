@@ -5,6 +5,8 @@ import { selection } from "./src/download.js";
 import { remDir, setDir } from "./src/folder.js";
 const program = new Command();
 
+let flag = true;
+
 const questions = [
   [
     {
@@ -32,12 +34,24 @@ const questions = [
       message: "video or audio download?",
       choices: ["video", "audio"],
     },
+    {
+      type: "string",
+      name: "path",
+      message:
+        "download folder path ('Enter' to use default 'Downloads' in Home Directory or already set custom folder path)?",
+    },
   ],
   [
     {
       type: "string",
       name: "videoLink",
       message: "youtube video link address?",
+    },
+    {
+      type: "list",
+      name: "selection",
+      message: "video or audio download?",
+      choices: ["video", "audio"],
     },
   ],
 ];
@@ -72,9 +86,24 @@ program
   .alias("dld")
   .description("downloads a youtube video or audio")
   .action(() => {
-    inquirer.prompt(questions[2]).then((answers) => {
-      selection(answers.videoLink, answers.selection);
-    });
+    if (flag) {
+      inquirer.prompt(questions[2]).then((answers) => {
+        const path = answers.path;
+        setDir({ path });
+        selection(answers.videoLink, answers.selection);
+        flag = false;
+      });
+    } else {
+      inquirer.prompt(questions[3]).then((answers) => {
+        selection(answers.videoLink, answers.selection);
+      });
+    }
+    // inquirer.prompt(questions[2]).then((answers) => {
+    //   const path = answers.path;
+    //   setDir({ path });
+    //   selection(answers.videoLink, answers.selection);
+    //   // console.log(answers);
+    // });
   });
 
 program.parse(process.argv);

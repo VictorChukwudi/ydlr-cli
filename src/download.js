@@ -10,7 +10,7 @@ import { spawn } from "child_process";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 
-import { db } from "./folder.js";
+import { db, setDir } from "./folder.js";
 
 const spinner = ora("Download starting. Please wait");
 
@@ -28,7 +28,7 @@ const downloadVideo = async (url) => {
       let receivedBytes = 0;
       const info = await ytdl.getInfo(url);
       const getTitle = info.videoDetails.title;
-      const downloadTitle = `${getTitle.replace(/\W/g, " ")}.mp4`;
+      const downloadTitle = `${getTitle.replace(/\W$/g, "")}.mp4`;
       let file;
       let resultFolder;
       //check for custom download folder directory
@@ -78,10 +78,12 @@ const downloadVideo = async (url) => {
       });
       db.close();
     } else {
-      console.info("invalid video url");
+      // console.info("invalid video url");
+      spinner.fail("invalid info");
     }
   } catch (error) {
-    console.info(error);
+    // console.info(error);
+    spinner.fail("an error occured");
   }
 };
 
@@ -95,7 +97,7 @@ const downloadAudio = async (url) => {
       let receivedBytes = 0;
       const info = await ytdl.getInfo(url);
       const getTitle = info.videoDetails.title;
-      const title = `${getTitle.replace(/\W/g, " ")}`;
+      const title = `${getTitle.replace(/\W$/g, "")}`;
       const downloadTitle = `${title}.mp4`;
       const __filename = fileURLToPath(import.meta.url);
       const __dirname = join(dirname(__filename) + "/temp");
@@ -157,10 +159,12 @@ const downloadAudio = async (url) => {
         }
       });
     } else {
-      console.info("invalid video url");
+      // console.info("invalid video url");
+      spinner.fail("invalid video url");
     }
   } catch (error) {
-    console.info(error);
+    // console.info(error);
+    spinner.fail("an error occurred");
   }
 };
 
@@ -250,13 +254,6 @@ const conversion = (title, downloadTitle, outputPath) => {
   });
 };
 
-export {
-  selection,
-  downloadVideo,
-  downloadAudio,
-  conversion,
-  download,
-  downloadForAudio,
-};
+export { selection };
 //https://www.youtube.com/watch?v=ZgMw__KdjiI
 //https://www.youtube.com/watch?v=zhWDdy_5v2w
