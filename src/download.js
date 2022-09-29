@@ -99,6 +99,13 @@ const downloadAudio = async (url) => {
       const downloadTitle = `${title}.mp4`;
       const __filename = fileURLToPath(import.meta.url);
       const __dirname = join(dirname(__filename) + "/temp");
+
+      //Creating dirname if it doesn't exist
+      fs.access(__dirname, (err) => {
+        if (err) {
+          mkdir(__dirname);
+        }
+      });
       const tempFile = fs.createWriteStream(`${__dirname}/${downloadTitle}`);
       let outputPath;
 
@@ -218,18 +225,31 @@ const downloadForAudio = (
 };
 
 const conversion = (title, downloadTitle, outputPath) => {
-  const audio = spawn(path, ["-i", `src/temp/${downloadTitle}`, outputPath]);
-  audio
-    .on("exit", () => {
+  fs.access(outputPath, (err) => {
+    if (err) {
+      const audio = spawn(path, [
+        "-i",
+        `src/temp/${downloadTitle}`,
+        outputPath,
+      ]);
+      audio
+        .on("exit", () => {
+          unlink(`src/temp/${downloadTitle}`);
+          spinner.succeed(
+            `Audio conversion complete. Download Path - ${outputPath}`
+          );
+        })
+        .on("error", () => {
+          unlink(outputPath);
+          spinner.fail("conversion error");
+        });
+    } else {
       unlink(`src/temp/${downloadTitle}`);
       spinner.succeed(
         `Audio conversion complete. Download Path - ${outputPath}`
       );
-    })
-    .on("error", () => {
-      unlink(outputPath);
-      spinner.fail("conversion error");
-    });
+    }
+  });
 };
 
 export {
