@@ -10,6 +10,13 @@ import { spawn } from "child_process";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 
+//Global path for video removal after conversion to audio
+const myfilename = fileURLToPath(import.meta.url);
+const mydirname = join(dirname(myfilename));
+if (!fs.existsSync(mydirname)) {
+  fs.mkdirSync(mydirname);
+}
+
 // import { db } from "./folder.js";
 import Database from "better-sqlite3";
 const db = new Database("folder.db");
@@ -140,7 +147,7 @@ const downloadAudio = async (url) => {
           } else {
             //when the path exists
             //download and conversion process starts
-            outputPath = `${res.path}/${title}.mp3`;
+            outputPath = `${res.path}\\${title}.mp3`;
             //download process
             downloadForAudio(
               spinner,
@@ -211,7 +218,7 @@ const downloadForAudio = (
     .pipe(tempFile)
     .on("error", (err) => {
       console.log(err);
-      unlink(`./src/temp/${downloadTitle}`);
+      unlink(`${mydirname}/temp/${downloadTitle}`);
       spinner.fail("An error occurred");
     });
   tempFile.on("finish", () => {
@@ -220,7 +227,7 @@ const downloadForAudio = (
     conversion(title, downloadTitle, outputPath);
   });
   tempFile.on("error", () => {
-    unlink(`./src/temp/${downloadTitle}`);
+    unlink(`${mydirname}/temp/${downloadTitle}`);
     spinner.fail("file error");
   });
 };
@@ -230,12 +237,12 @@ const conversion = (title, downloadTitle, outputPath) => {
     if (err) {
       const audio = spawn(path, [
         "-i",
-        `src/temp/${downloadTitle}`,
+        `${mydirname}/temp/${downloadTitle}`,
         outputPath,
       ]);
       audio
         .on("exit", () => {
-          unlink(`src/temp/${downloadTitle}`);
+          unlink(`${mydirname}/temp/${downloadTitle}`);
           spinner.succeed(
             `Audio conversion complete. Download Path - ${outputPath}`
           );
@@ -245,7 +252,7 @@ const conversion = (title, downloadTitle, outputPath) => {
           spinner.fail("conversion error");
         });
     } else {
-      unlink(`src/temp/${downloadTitle}`);
+      unlink(`${mydirname}/temp/${downloadTitle}`);
       spinner.succeed(
         `Audio conversion complete. Download Path - ${outputPath}`
       );
