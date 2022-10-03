@@ -89,9 +89,13 @@ program
     let res = stmt.get();
     if (!res) {
       inquirer.prompt(questions[2]).then((answers) => {
-        const path = answers.path;
-        setDir({ path });
-        selection(answers.videoLink, answers.selection);
+        if (!answers.path) {
+          selection(answers.videoLink, answers.selection);
+        } else {
+          const path = answers.path;
+          setDir({ path });
+          selection(answers.videoLink, answers.selection);
+        }
       });
     } else {
       inquirer.prompt(questions[3]).then((answers) => {
