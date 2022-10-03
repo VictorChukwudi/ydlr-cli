@@ -17,7 +17,7 @@ The node modules used for this projects are
 - Commander
 - Inquirer
 - Ytdl-core
-- Sqlite3
+- better-sqlite3
 - etc.
 
 with their versions shown in the package.json file.
