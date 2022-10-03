@@ -46,3 +46,21 @@ $ ydlr-cli
 ```
 
 This command gives you a list of the allowed commands. You can the try out the tool.
+
+### List of Commands
+
+This CLI has the following commands:
+
+- Usage:
+
+```
+ydlr-cli <command>
+```
+
+| Command | Description                                                                      |
+| ------- | -------------------------------------------------------------------------------- |
+| sdir    | sets or updates a custom download path for storing the downloaded video or audio |
+| rdir    | removes an already set custom download directory path                            |
+| dld     | downlaods a youtube video or audio                                               |
+| -V      | check the version of the program                                                 |
+| -h      | help command                                                                     |
