@@ -1,35 +1,36 @@
-import sqlite from "sqlite3";
 import ora from "ora";
-const db = new sqlite.Database("folder.db");
-db.run(
-  "CREATE TABLE IF NOT EXISTS folder(id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT)"
-);
 
+import Database from "better-sqlite3";
+const db = new Database("folder.db");
+
+db.prepare(
+  "CREATE TABLE IF NOT EXISTS folder(id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT)"
+).run();
 const spinner = ora();
 
-const setDir =  ({ path }) => {
-  //   console.info(`path ${path} set`);
+const setDir = ({ path }) => {
+  const stmt = db.prepare(`SELECT * FROM folder `);
+  const res = stmt.get();
+  if (!res) {
+    db.prepare("INSERT INTO folder (path) VALUES (?)").run(`${path}`);
 
-  db.get(`SELECT * FROM folder `, (err, row) => {
-    if (!row) {
-      db.run("INSERT INTO folder (path) VALUES (?)", [`${path}`]);
-      spinner.succeed(`Download path "${path}" set successfully`);
-    } else if (row) {
-      db.run(`UPDATE folder SET path = ? WHERE id = 1`, [`${path}`]);
-      spinner.succeed(`Download path "${path}" updated successfully`);
-    }
-  });
+    spinner.succeed(`Download path "${path}" set successfully`);
+  } else {
+    db.prepare("UPDATE folder SET path = ? WHERE id = 1").run(`${path}`);
+
+    spinner.succeed(`Download path "${path}" updated successfully`);
+  }
   db.close();
 };
 
 const remDir = () => {
-  db.run("DROP TABLE IF EXISTS folder", (err) => {
-    if (err) {
-      console.info("error occurred when removing custom download folder path");
-    } else {
-      spinner.succeed("custom download directory removed successfully");
-    }
-  });
+  const stmt = db.prepare("DROP TABLE IF EXISTS folder");
+  const res = stmt.run();
+  if (!res) {
+    spinner.fail("error occurred when removing custom download folder path");
+  } else {
+    spinner.succeed("custom download directory removed successfully");
+  }
 };
 
 export { db, setDir, remDir };
