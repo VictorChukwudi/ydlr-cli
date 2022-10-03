@@ -54,7 +54,7 @@ This CLI has the following commands:
 - Usage:
 
 ```
-ydlr-cli <command>
+$ ydlr-cli <command>
 ```
 
 | Command | Description                                                                      |
@@ -64,3 +64,7 @@ ydlr-cli <command>
 | dld     | downlaods a youtube video or audio                                               |
 | -V      | check the version of the program                                                 |
 | -h      | help command                                                                     |
+
+## Contribution:
+
+Head over to the [CONTRIBUTING.md]() to know how to contribute to this work.
