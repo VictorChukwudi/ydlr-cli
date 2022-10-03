@@ -67,4 +67,4 @@ $ ydlr-cli <command>
 
 ## Contribution:
 
-Head over to the [CONTRIBUTING.md]() to know how to contribute to this work.
+Head over to the [CONTRIBUTING.md](https://github.com/VictorChukwudi/ydlr-cli/blob/main/CONTRIBUTING.md) to know how to contribute to this work.
