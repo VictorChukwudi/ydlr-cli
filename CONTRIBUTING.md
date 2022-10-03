@@ -11,4 +11,4 @@ To contribute to this work,
 
 #### Note:
 
-Only **new** features, fixed bugs or redundant blocks of codes will be merged.
+Only **new features, bug fixes or refactoring of codes** will be merged.
