@@ -2,10 +2,8 @@
 import inquirer from "inquirer";
 import { Command } from "commander";
 import { selection } from "./src/download.js";
-import { remDir, setDir } from "./src/folder.js";
+import { remDir, setDir, db } from "./src/folder.js";
 const program = new Command();
-
-let flag = true;
 
 const questions = [
   [
@@ -68,7 +66,8 @@ program
   .description("sets a custom download directory path")
   .action(() => {
     inquirer.prompt(questions[0]).then((answers) => {
-      setDir(answers);
+      const path = answers.path;
+      setDir({ path, firsttime: "false" });
     });
   });
 
@@ -86,24 +85,19 @@ program
   .alias("dld")
   .description("downloads a youtube video or audio")
   .action(() => {
-    if (flag) {
+    let stmt = db.prepare("SELECT * FROM folder WHERE id = 1");
+    let res = stmt.get();
+    if (!res) {
       inquirer.prompt(questions[2]).then((answers) => {
         const path = answers.path;
         setDir({ path });
         selection(answers.videoLink, answers.selection);
-        flag = false;
       });
     } else {
       inquirer.prompt(questions[3]).then((answers) => {
         selection(answers.videoLink, answers.selection);
       });
     }
-    // inquirer.prompt(questions[2]).then((answers) => {
-    //   const path = answers.path;
-    //   setDir({ path });
-    //   selection(answers.videoLink, answers.selection);
-    //   // console.log(answers);
-    // });
   });
 
 program.parse(process.argv);

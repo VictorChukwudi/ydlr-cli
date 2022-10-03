@@ -19,7 +19,8 @@ The node modules used for this projects are
 - Ytdl-core
 - Sqlite3
 - etc.
-  with their versions shown in the package.json file.
+
+with their versions shown in the package.json file.
 
 ## Setup
 
