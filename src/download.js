@@ -57,7 +57,7 @@ const downloadVideo = async (url) => {
         file = fs.createWriteStream(
           `${os.homedir()}/Downloads/${downloadTitle}`
         );
-        resultFolder = `${os.homedir()}/Downloads`;
+        resultFolder = `${os.homedir()}/Downloads/${downloadTitle}`;
         // //download process
         download(spinner, url, file, receivedBytes, resultFolder);
       } else {
@@ -73,7 +73,7 @@ const downloadVideo = async (url) => {
             //when the path exists
             //download process starts
             file = fs.createWriteStream(`${res.path}/${downloadTitle}`);
-            resultFolder = `${res.path}`;
+            resultFolder = `${res.path}/${downloadTitle}`;
             // download process
             download(spinner, url, file, receivedBytes, res.path, resultFolder);
           }
@@ -185,14 +185,14 @@ const download = (spinner, url, file, receivedBytes, resultFolder) => {
     })
     .pipe(file)
     .on("error", (err) => {
-      unlink(file);
+      unlink(resultFolder);
       spinner.fail("An error occurred");
     });
   file.on("finish", () => {
     spinner.succeed(`Download complete. Download folder - ${resultFolder}`);
   });
   file.on("error", () => {
-    unlink(file);
+    unlink(resultFolder);
     spinner.fail("file error");
   });
 };
