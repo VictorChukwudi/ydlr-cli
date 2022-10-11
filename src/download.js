@@ -16,7 +16,6 @@ const mydirname = join(dirname(myfilename));
 if (!fs.existsSync(mydirname)) {
   fs.mkdirSync(mydirname);
 }
-
 // import { db } from "./folder.js";
 import Database from "better-sqlite3";
 const db = new Database("folder.db");
@@ -104,14 +103,14 @@ const downloadAudio = async (url) => {
       const downloadTitle = `${title}.mp4`;
       const __filename = fileURLToPath(import.meta.url);
       const __dirname = join(dirname(__filename) + "/temp");
+      let outputPath;
 
       //Creating dirname if it doesn't exist
       if (!fs.existsSync(__dirname)) {
         fs.mkdirSync(__dirname);
       }
       const tempFile = fs.createWriteStream(`${__dirname}/${downloadTitle}`);
-      let outputPath;
-
+      const downloadPath = `${__dirname}/${downloadTitle}`;
       //check for custom download folder directory
       let stmt = db.prepare(`SELECT path FROM folder WHERE id = 1`);
       let res = stmt.get();
@@ -125,7 +124,7 @@ const downloadAudio = async (url) => {
         });
 
         //download and conversion process
-        outputPath = `${os.homedir()}/Downloads/${title}.mp3`;
+        outputPath = `${os.homedir()}\\Downloads\\${title}.mp3`;
         downloadForAudio(
           spinner,
           url,
@@ -133,6 +132,7 @@ const downloadAudio = async (url) => {
           receivedBytes,
           title,
           downloadTitle,
+          downloadPath,
           outputPath
         );
       } else {
@@ -156,6 +156,7 @@ const downloadAudio = async (url) => {
               receivedBytes,
               title,
               downloadTitle,
+              downloadPath,
               outputPath
             );
           }
@@ -204,6 +205,7 @@ const downloadForAudio = (
   receivedBytes,
   title,
   downloadTitle,
+  downloadPath,
   outputPath
 ) => {
   spinner.start();
@@ -224,7 +226,7 @@ const downloadForAudio = (
   tempFile.on("finish", () => {
     spinner.succeed(" Video download complete");
     spinner.start("Converting to audio....");
-    conversion(title, downloadTitle, outputPath);
+    conversion(title, downloadTitle, downloadPath, outputPath);
   });
   tempFile.on("error", () => {
     unlink(`${mydirname}/temp/${downloadTitle}`);
@@ -232,14 +234,10 @@ const downloadForAudio = (
   });
 };
 
-const conversion = (title, downloadTitle, outputPath) => {
+const conversion = (title, downloadTitle, downloadPath, outputPath) => {
   fs.access(outputPath, (err) => {
     if (err) {
-      const audio = spawn(path, [
-        "-i",
-        `${mydirname}/temp/${downloadTitle}`,
-        outputPath,
-      ]);
+      const audio = spawn(path, ["-i", downloadPath, outputPath]);
       audio
         .on("exit", () => {
           unlink(`${mydirname}/temp/${downloadTitle}`);
